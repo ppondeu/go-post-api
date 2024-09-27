@@ -24,7 +24,7 @@ A RESTful API built with Go using the Gin framework and GORM ORM for user authen
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/post-api.git
+   git clone https://github.com/ppondeu/go-post-api.git
    cd post-api
 2. Install dependencies:
     ```bash
@@ -38,17 +38,12 @@ A RESTful API built with Go using the Gin framework and GORM ORM for user authen
     go run ./cmd/api/main.go
 
 ## Configuration
-The API uses a config.yaml file for configuration. Ensure that you configure your database connection and JWT settings correctly in config.yaml:
+The API uses a config.yaml file for configuration. Ensure that you configure your database connection and JWT settings correctly in .env:
+    
+    DB_USER=your_db_user
+    DB_PASSWORD=your_db_password
+    DB_NAME=your_db_name
+    DB_HOST=your_db_host
+    DB_PORT=your_db_port
 
-    database:
-    host: localhost
-    user: yourusername
-    password: yourpassword
-    dbname: yourdbname
-    port: 5432
-
-    jwt:
-    access_secret: youraccesstokensecret
-    refresh_secret: yourrefreshtokensecret
-    access_token_duration: 15m
-    refresh_token_duration: 24h
+    SERVER_PORT=yout_server_port
