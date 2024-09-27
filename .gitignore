@@ -50,6 +50,7 @@ out/
 .DS_Store
 Thumbs.db
 
-# Ignore all files in the internal directory except those ending in .go
-internal/*
-!internal/**/*.go
+
+
+# migration files
+migration/
