@@ -1,11 +1,14 @@
 package usecase
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/dto"
 	"github.com/ppondeu/go-post-api/errs"
 	"github.com/ppondeu/go-post-api/internal/domain"
 	"github.com/ppondeu/go-post-api/logs"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
@@ -39,10 +42,15 @@ func (s *UserServiceImpl) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 }
 
 func (s *UserServiceImpl) CreateUser(createUserDto *dto.CreateUserDto) (*domain.User, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(createUserDto.Password), bcrypt.DefaultCost)
+	if err != nil {
+		logs.Error(err)
+		return nil, errs.NewInternalServerError()
+	}
 	user := &domain.User{
 		Username: createUserDto.Username,
 		Email:    createUserDto.Email,
-		Password: createUserDto.Password,
+		Password: string(hashedPassword),
 		ShortBio: createUserDto.ShortBio,
 	}
 	result, err := s.userRepo.Create(user)
@@ -81,10 +89,20 @@ func (s *UserServiceImpl) GetUserByEmail(email string) (*domain.User, error) {
 }
 
 func (s *UserServiceImpl) UpdateUser(ID uuid.UUID, updateUserDto *dto.UpdateUserDto) (*domain.User, error) {
+	fmt.Println("updateUserDto: ", updateUserDto)
 	user := &domain.User{
 		Username: updateUserDto.Username,
 		ShortBio: updateUserDto.ShortBio,
 	}
+	if updateUserDto.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateUserDto.Password), bcrypt.DefaultCost)
+		if err != nil {
+			logs.Error(err)
+			return nil, errs.NewInternalServerError()
+		}
+		user.Password = string(hashedPassword)
+	}
+
 	result, err := s.userRepo.Update(ID, user)
 	if err != nil {
 		logs.Error(err)
@@ -103,10 +121,15 @@ func (s *UserServiceImpl) DeleteUser(ID uuid.UUID) error {
 }
 
 func (s *UserServiceImpl) CreateUserAndSession(createUserDto *dto.CreateUserDto, refreshToken *string) (*domain.User, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(createUserDto.Password), bcrypt.DefaultCost)
+	if err != nil {
+		logs.Error(err)
+		return nil, errs.NewInternalServerError()
+	}
 	user := &domain.User{
 		Username: createUserDto.Username,
 		Email:    createUserDto.Email,
-		Password: createUserDto.Password,
+		Password: string(hashedPassword),
 		ShortBio: createUserDto.ShortBio,
 	}
 	result, err := s.userRepo.CreateUserAndSession(user, refreshToken)

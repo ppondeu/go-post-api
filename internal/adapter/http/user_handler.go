@@ -31,7 +31,16 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 		response.NewErrorResponse(c, err)
 		return
 	}
-	response.NewSuccessResponse(c, users)
+	usersResponse := make([]dto.UserResponseDto, 0)
+	for _, user := range users {
+		usersResponse = append(usersResponse, dto.UserResponseDto{
+			ID:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
+			ShortBio: user.ShortBio,
+		})
+	}
+	response.NewSuccessResponse(c, usersResponse)
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {
@@ -48,7 +57,14 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 		response.NewErrorResponse(c, err)
 		return
 	}
-	response.NewSuccessResponse(c, user)
+	
+	userResponse := dto.UserResponseDto{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		ShortBio: user.ShortBio,
+	}
+	response.NewSuccessResponse(c, userResponse)
 }
 
 func (h *UserHandler) GetUserSession(c *gin.Context) {
@@ -74,7 +90,13 @@ func (h *UserHandler) GetUserByUsername(c *gin.Context) {
 		response.NewErrorResponse(c, err)
 		return
 	}
-	response.NewSuccessResponse(c, user)
+	userResponse := dto.UserResponseDto{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		ShortBio: user.ShortBio,
+	}
+	response.NewSuccessResponse(c, userResponse)
 }
 
 func (h *UserHandler) GetUserByEmail(c *gin.Context) {
@@ -85,7 +107,14 @@ func (h *UserHandler) GetUserByEmail(c *gin.Context) {
 		return
 	}
 
-	response.NewSuccessResponse(c, user)
+	userResponse := dto.UserResponseDto{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		ShortBio: user.ShortBio,
+	}
+
+	response.NewSuccessResponse(c, userResponse)
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
@@ -113,7 +142,14 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		response.NewErrorResponse(c, err)
 		return
 	}
-	response.NewCreatedResponse(c, user)
+
+	userResponse := dto.UserResponseDto{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		ShortBio: user.ShortBio,
+	}
+	response.NewCreatedResponse(c, userResponse)
 }
 
 func (h *UserHandler) UpdateUser(c *gin.Context) {
@@ -149,7 +185,14 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		response.NewErrorResponse(c, err)
 		return
 	}
-	response.NewSuccessResponse(c, user)
+
+	userResponse := dto.UserResponseDto{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		ShortBio: user.ShortBio,
+	}
+	response.NewSuccessResponse(c, userResponse)
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
