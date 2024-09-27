@@ -1,0 +1,55 @@
+# Go binaries
+/bin
+/*.exe
+/*.exe~
+/*.dll
+/*.so
+/*.dylib
+
+# Test binary, build cache, and coverage
+/test
+/*.test
+/coverage.out
+
+# Dependency directories
+/vendor/
+/Gopkg.lock
+/Gopkg.toml
+
+# IDE and editor files
+.idea/
+*.iml
+*.vscode/
+*.swp
+*.swo
+
+# Logs and temporary files
+*.log
+*.tmp
+*.tmp.*
+
+# Environment variables file
+.env
+.env.local
+.env.production
+.env.development
+
+# Configuration files
+config.yaml
+
+# Database files
+*.db
+*.sqlite
+
+# Build artifacts
+/build/
+dist/
+out/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore all files in the internal directory except those ending in .go
+internal/*
+!internal/**/*.go
