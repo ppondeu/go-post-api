@@ -164,22 +164,6 @@ func (s *authServiceImpl) RefreshToken(refreshToken string, ID uuid.UUID) (*dto.
 
 func (s *authServiceImpl) Logout(refreshToken string, ID uuid.UUID) error {
 
-	// claims, err := s.jwtService.ValidateToken(refreshToken, "refresh")
-	// if err != nil {
-	// 	logger.Error(err)
-	// 	return err
-	// }
-
-	// if claims.TokenType != "refresh" {
-	// 	return errs.NewForbiddenError("invalid token type")
-	// }
-
-	// userId, err := uuid.Parse(claims.Sub)
-	// if err != nil {
-	// 	logger.Error(err)
-	// 	return err
-	// }
-
 	user, err := s.userService.GetUserSession(ID)
 	if err != nil {
 		logger.Error(err)
