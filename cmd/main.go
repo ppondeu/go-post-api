@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/ppondeu/go-post-api/internal/handler"
 	"github.com/ppondeu/go-post-api/internal/repository"
 	"github.com/ppondeu/go-post-api/internal/routes"
 	"github.com/ppondeu/go-post-api/internal/usecase"
+	"github.com/ppondeu/go-post-api/internal/validate"
 
 	"github.com/ppondeu/go-post-api/config"
 	database "github.com/ppondeu/go-post-api/internal/db"
@@ -17,12 +17,14 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	db := database.ConnectDatabase(cfg)
-	validate := validator.New()
+	validate := validate.NewValidator()
+
 	userRepo := repository.NewUserRepositoryDB(db)
 	userService := usecase.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService, validate)
 
-	authService := usecase.NewAuthService(userService, []byte(cfg.ACCESS_SECRET), []byte(cfg.REFRESH_SECRET))
+	jwtService := usecase.NewJwtService([]byte(cfg.ACCESS_SECRET), []byte(cfg.REFRESH_SECRET))
+	authService := usecase.NewAuthService(userService, jwtService)
 	authHandler := handler.NewAuthHandler(authService, validate)
 
 	router := gin.Default()
@@ -33,7 +35,7 @@ func main() {
 	})
 
 	routes.SetupUserRouter(router, userHandler)
-	routes.SetupAuthRouter(router, authHandler)
+	routes.SetupAuthRouter(router, authHandler, &jwtService)
 
 	fmt.Printf("Server running on port %v", cfg.SERVER_PORT)
 	router.Run(":" + cfg.SERVER_PORT)

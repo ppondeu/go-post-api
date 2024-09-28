@@ -8,9 +8,9 @@ import (
 )
 
 type ApiResponse struct {
-	StatusCode uint16      `json:"status_code"`
+	StatusCode uint16      `json:"statusCode"`
 	Message    string      `json:"message"`
-	Data       interface{} `json:"data"`
+	Data       interface{} `json:"data,omitempty"`
 }
 
 func NewApiResponse(c *gin.Context, statusCode int, message string, data interface{}) {
