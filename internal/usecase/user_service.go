@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/ppondeu/go-post-api/internal/domain"
 	"github.com/ppondeu/go-post-api/internal/dto"
 	errs "github.com/ppondeu/go-post-api/internal/errors"
-	"github.com/ppondeu/go-post-api/internal/domain"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,6 +16,8 @@ type UserService interface {
 	GetUserByUsername(username string) (*domain.User, error)
 	GetUserByEmail(email string) (*domain.User, error)
 	GetAllUsers() ([]domain.User, error)
+	GetUserWithRelation(ID uuid.UUID) (*domain.User, error)
+	GetUsersWithRelation() ([]domain.User, error)
 	CreateUser(createUserDto *dto.CreateUserDto) (*domain.User, error)
 	UpdateUser(ID uuid.UUID, updateUserDto *dto.UpdateUserDto) (*domain.User, error)
 	UpdateUserSession(userID uuid.UUID, refreshToken *string) error
@@ -156,4 +158,22 @@ func (s *UserServiceImpl) GetUserSession(userID uuid.UUID) (*domain.UserSession,
 		return nil, err
 	}
 	return session, nil
+}
+
+func (s *UserServiceImpl) GetUserWithRelation(ID uuid.UUID) (*domain.User, error) {
+	user, err := s.userRepo.FindUserWithRelation(ID)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	return user, nil
+}
+
+func (s *UserServiceImpl) GetUsersWithRelation() ([]domain.User, error) {
+	users, err := s.userRepo.FindAllUsersWithRelation()
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	return users, nil
 }

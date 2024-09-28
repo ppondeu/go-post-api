@@ -17,6 +17,9 @@ func SetupUserRouter(router *gin.Engine, userHandler *handler.UserHandler) {
 		user.POST("/", userHandler.CreateUser)
 		user.PATCH("/:id", userHandler.UpdateUser)
 		user.DELETE("/:id", userHandler.DeleteUser)
-		// user.PATCH("/:id/session", userHandler.UpdateUserSession)
+		user.PATCH("/session/:id", userHandler.UpdateUserSession)
+
+		user.GET("/test", userHandler.GetUsersWithRelation)
+		user.GET("/test/id", userHandler.GetUserWithRelation)
 	}
 }

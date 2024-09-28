@@ -211,39 +211,64 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	response.NewSuccessResponse(c, nil)
 }
 
-// func (h *UserHandler) UpdateUserSession(c *gin.Context) {
-// 	idParam := c.Param("id")
-// 	id, err := uuid.Parse(idParam)
-// 	if err != nil {
-// 		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
-// 		return
-// 	}
-// 	type RefreshToken struct {
-// 		RefreshToken *string `json:"refresh_token" validate:"omitempty"`
-// 	}
-// 	var body RefreshToken
-// 	if err := c.ShouldBindJSON(&body); err != nil {
-// 		logger.Error(err)
-// 		response.NewErrorResponse(c, err)
-// 		return
-// 	}
+func (h *UserHandler) UpdateUserSession(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		return
+	}
+	type RefreshToken struct {
+		RefreshToken *string `json:"refresh_token" validate:"omitempty"`
+	}
+	var body RefreshToken
+	if err := c.ShouldBindJSON(&body); err != nil {
+		logger.Error(err)
+		response.NewErrorResponse(c, err)
+		return
+	}
 
-// 	if err := h.validator.Struct(body); err != nil {
-// 		if _, ok := err.(*validator.InvalidValidationError); ok {
-// 			logger.Error(err)
-// 			response.NewErrorResponse(c, err)
-// 			return
-// 		}
-// 		logger.Error(err)
-// 		response.NewErrorResponse(c, errs.NewBadRequestError(err.Error()))
-// 		return
-// 	}
+	if err := h.validator.Struct(body); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, err)
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errs.NewBadRequestError(err.Error()))
+		return
+	}
 
-// 	err = h.userService.UpdateUserSession(id, body.RefreshToken)
-// 	if err != nil {
-// 		response.NewErrorResponse(c, err)
-// 		return
-// 	}
+	err = h.userService.UpdateUserSession(id, body.RefreshToken)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
 
-// 	response.NewSuccessResponse(c, nil)
-// }
+	response.NewSuccessResponse(c, nil)
+}
+
+func (h *UserHandler) GetUsersWithRelation(c *gin.Context) {
+	users, err := h.userService.GetUsersWithRelation()
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+	response.NewSuccessResponse(c, users)
+}
+
+func (h *UserHandler) GetUserWithRelation(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		return
+	}
+
+	user, err := h.userService.GetUserWithRelation(id)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+	response.NewSuccessResponse(c, user)
+}
