@@ -12,13 +12,13 @@ type User struct {
 	Email       string      `gorm:"unique;not null" json:"email"`
 	Password    string      `gorm:"not null" json:"password"`
 	ShortBio    string      `gorm:"type:varchar(160);default:''" json:"short_bio"`
-	UserSession UserSession `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user_session"` // Corrected the foreign key relation
+	UserSession UserSession `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user_session"`
 }
 
 type UserSession struct {
 	ID           string    `gorm:"type:uuID;primaryKey;default:gen_random_uuID()" json:"ID"`
 	UserID       string    `gorm:"type:uuID;not null;unique" json:"user_ID"`
-	RefreshToken *string   `gorm:"type:varchar(255);unique" json:"refresh_token"`
+	RefreshToken *string   `gorm:"type:text,unique" json:"refresh_token"`
 	UpdatedAt    time.Time `gorm:"type:timestamp;default:current_timestamp;autoUpdateTime" json:"updated_at"`
 }
 

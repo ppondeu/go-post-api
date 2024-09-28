@@ -18,10 +18,10 @@ type UserHandler struct {
 	validator   *validator.Validate
 }
 
-func NewUserHandler(service usecase.UserService) *UserHandler {
+func NewUserHandler(service usecase.UserService, validator *validator.Validate) *UserHandler {
 	return &UserHandler{
 		userService: service,
-		validator:   validator.New(),
+		validator:   validator,
 	}
 }
 
