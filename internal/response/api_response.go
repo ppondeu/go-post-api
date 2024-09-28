@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	errs "github.com/ppondeu/go-post-api/internal/error"
+	errs "github.com/ppondeu/go-post-api/internal/errors"
 )
 
 type ApiResponse struct {

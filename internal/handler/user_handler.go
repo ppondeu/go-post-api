@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/dto"
-	errs "github.com/ppondeu/go-post-api/internal/error"
+	errs "github.com/ppondeu/go-post-api/internal/errors"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"github.com/ppondeu/go-post-api/internal/response"
 	"github.com/ppondeu/go-post-api/internal/usecase"

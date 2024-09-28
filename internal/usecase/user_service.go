@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/dto"
-	errs "github.com/ppondeu/go-post-api/internal/error"
+	errs "github.com/ppondeu/go-post-api/internal/errors"
 	"github.com/ppondeu/go-post-api/internal/domain"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"golang.org/x/crypto/bcrypt"
