@@ -230,3 +230,81 @@ func (h *PostHandler) RemoveBookmark(c *gin.Context) {
 
 	response.NewSuccessResponse(c, nil)
 }
+
+func (h *PostHandler) LikePost(c *gin.Context) {
+	var likeDto dto.LikeDto
+	if err := c.ShouldBindJSON(&likeDto); err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	if err := h.validator.Struct(likeDto); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, errors.NewBadRequestError("Invalid request"))
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	userId, err := uuid.Parse(likeDto.UserID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	postId, err := uuid.Parse(likeDto.PostID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	err = h.postService.LikePost(userId, postId)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, nil)
+}
+
+func (h *PostHandler) UnlikePost(c *gin.Context) {
+	var likeDto dto.LikeDto
+	if err := c.ShouldBindJSON(&likeDto); err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	if err := h.validator.Struct(likeDto); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, errors.NewBadRequestError("Invalid request"))
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	userId, err := uuid.Parse(likeDto.UserID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	postId, err := uuid.Parse(likeDto.PostID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	err = h.postService.UnlikePost(userId, postId)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, nil)
+}

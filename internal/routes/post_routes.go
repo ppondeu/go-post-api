@@ -18,5 +18,7 @@ func SetupPostRouter(router *gin.Engine, postHander *handler.PostHandler) {
 		post.GET("/tags", postHander.GetTags)
 		post.POST("/bookmark", postHander.AddBookmark)
 		post.DELETE("/bookmark", postHander.RemoveBookmark)
+		post.POST("/like", postHander.LikePost)
+		post.DELETE("/like", postHander.UnlikePost)
 	}
 }

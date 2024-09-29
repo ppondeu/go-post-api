@@ -12,10 +12,12 @@ type User struct {
 	Email       string      `gorm:"unique;not null" json:"email"`
 	Password    string      `gorm:"not null" json:"password"`
 	ShortBio    string      `gorm:"type:varchar(160);default:''" json:"short_bio"`
-	UserSession UserSession `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"user_session"`
+	UserSession UserSession `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"userSession"`
 	Posts       []Post      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"posts"`
-	Follower    []Follow    `gorm:"foreignKey:FollowerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"follower"`
-	Followed    []Follow    `gorm:"foreignKey:FollowedID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"followed"`
+	Follower    []Follow    `gorm:"foreignKey:FollowerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Followed    []Follow    `gorm:"foreignKey:FollowedID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Likes       []Like      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	Bookmarks   []Bookmark  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
 type UserSession struct {

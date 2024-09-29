@@ -20,6 +20,8 @@ type PostService interface {
 	GetAllTags() ([]domain.Tag, error)
 	AddBookmark(userId, postId uuid.UUID) error
 	RemoveBookmark(userId, postId uuid.UUID) error
+	LikePost(userId, postId uuid.UUID) error
+	UnlikePost(userId, postId uuid.UUID) error
 }
 
 type postServiceImpl struct {
@@ -167,6 +169,59 @@ func (p *postServiceImpl) RemoveBookmark(userId, postId uuid.UUID) error {
 	}
 
 	err = p.postRepo.RemoveBookmark(userId, postId)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
+}
+
+func (p *postServiceImpl) LikePost(userId, postId uuid.UUID) error {
+	_, err := p.userService.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+	post, err := p.GetPostByID(postId)
+	if err != nil {
+		return err
+	}
+
+	if post.UserID == userId.String() {
+		logger.Error("You can't like your own post")
+		return errors.NewBadRequestError("You can't like your own post")
+	}
+
+	like := domain.Like{
+		UserID: userId.String(),
+		PostID: postId.String(),
+	}
+
+	err = p.postRepo.LikePost(like)
+	if err != nil {
+		logger.Error(err)
+		return errors.NewBadRequestError("You already liked this post")
+	}
+
+	return nil
+}
+
+func (p *postServiceImpl) UnlikePost(userId, postId uuid.UUID) error {
+	_, err := p.userService.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+	post, err := p.GetPostByID(postId)
+	if err != nil {
+		return err
+	}
+
+	if post.UserID == userId.String() {
+		logger.Error("You can't unlike your own post")
+		return errors.NewBadRequestError("You can't unlike your own post")
+	}
+
+	err = p.postRepo.UnlikePost(userId, postId)
 	if err != nil {
 		logger.Error(err)
 		return err

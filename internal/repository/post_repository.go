@@ -116,3 +116,19 @@ func (r *PostRepositoryDB) CreateTag(tag domain.Tag) (*domain.Tag, error) {
 	}
 	return &tag, nil
 }
+
+func (r *PostRepositoryDB) LikePost(like domain.Like) error {
+	err := r.db.Create(&like).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PostRepositoryDB) UnlikePost(userID, postID uuid.UUID) error {
+	err := r.db.Delete(&domain.Like{}, "user_id = ? AND post_id = ?", userID, postID).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
