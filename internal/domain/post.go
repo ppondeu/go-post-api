@@ -29,12 +29,13 @@ type Bookmark struct {
 	ID        string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID    string    `gorm:"type:uuid;not null;uniqueIndex:idx_user_post_bookmark"`
 	PostID    string    `gorm:"type:uuid;not null;uniqueIndex:idx_user_post_bookmark"`
+	Post      Post      `gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt time.Time `gorm:"type:timestamp;default:current_timestamp"`
 }
 
 type Tag struct {
 	ID   string `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	Name string `gorm:"type:varchar(255);not null"`
+	Name string `gorm:"type:varchar(255);not null,unique"`
 }
 
 type Post struct {
@@ -56,4 +57,6 @@ type PostRepository interface {
 	Save(post Post) (*Post, error)
 	Update(ID uuid.UUID, post Post) (*Post, error)
 	Delete(ID uuid.UUID) error
+
+	FindAllTags() ([]Tag, error)
 }

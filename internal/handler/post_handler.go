@@ -143,3 +143,12 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 	}
 	response.NewSuccessResponse(c, nil)
 }
+
+func (h *PostHandler) GetTags(c *gin.Context) {
+	tags, err := h.postService.GetAllTags()
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+	response.NewSuccessResponse(c, tags)
+}

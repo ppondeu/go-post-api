@@ -14,5 +14,7 @@ func SetupPostRouter(router *gin.Engine, postHander *handler.PostHandler) {
 		post.POST("/", postHander.CreatePost)
 		post.PATCH("/:id", postHander.UpdatePost)
 		post.DELETE("/:id", postHander.DeletePost)
+
+		post.GET("/tags", postHander.GetTags)
 	}
 }

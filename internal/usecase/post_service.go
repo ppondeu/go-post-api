@@ -16,6 +16,8 @@ type PostService interface {
 	CreatePost(post dto.CreatePostDto) (*domain.Post, error)
 	UpdatePost(ID uuid.UUID, post dto.UpdatePostDto) (*domain.Post, error)
 	DeletePost(ID uuid.UUID) error
+
+	GetAllTags() ([]domain.Tag, error)
 }
 
 type postServiceImpl struct {
@@ -106,4 +108,14 @@ func (p *postServiceImpl) DeletePost(ID uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (p *postServiceImpl) GetAllTags() ([]domain.Tag, error) {
+	tags, err := p.postRepo.FindAllTags()
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	return tags, nil
 }

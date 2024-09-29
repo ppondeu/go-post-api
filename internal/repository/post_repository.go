@@ -76,3 +76,12 @@ func (r *PostRepositoryDB) Delete(ID uuid.UUID) error {
 	}
 	return nil
 }
+
+func (r *PostRepositoryDB) FindAllTags() ([]domain.Tag, error) {
+	var tags []domain.Tag
+	result := r.db.Find(&tags)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return tags, nil
+}
