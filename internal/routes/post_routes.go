@@ -20,5 +20,11 @@ func SetupPostRouter(router *gin.Engine, postHander *handler.PostHandler) {
 		post.DELETE("/bookmark", postHander.RemoveBookmark)
 		post.POST("/like", postHander.LikePost)
 		post.DELETE("/like", postHander.UnlikePost)
+
+		post.GET("/:id/comments", postHander.GetCommentsByPostID)
+		post.GET("/comment/:id", postHander.GetCommentByID)
+		post.POST("/comment", postHander.AddComment)
+		post.PATCH("/comment/:id", postHander.UpdateComment)
+		post.DELETE("/comment/:id", postHander.DeleteComment)
 	}
 }

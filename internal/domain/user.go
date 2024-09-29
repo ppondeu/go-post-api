@@ -7,24 +7,25 @@ import (
 )
 
 type User struct {
-	ID          string      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	ID          string      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	Username    string      `gorm:"unique;not null" json:"username"`
 	Email       string      `gorm:"unique;not null" json:"email"`
 	Password    string      `gorm:"not null" json:"password"`
-	ShortBio    string      `gorm:"type:varchar(160);default:''" json:"short_bio"`
+	ShortBio    string      `gorm:"type:varchar(160);default:''" json:"shortBio"`
 	UserSession UserSession `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"userSession"`
 	Posts       []Post      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"posts"`
-	Follower    []Follow    `gorm:"foreignKey:FollowerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Followed    []Follow    `gorm:"foreignKey:FollowedID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Likes       []Like      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
-	Bookmarks   []Bookmark  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	Follower    []Follow    `gorm:"foreignKey:FollowerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"follower"`
+	Followed    []Follow    `gorm:"foreignKey:FollowedID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"followed"`
+	Likes       []Like      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"likes,omitempty"`
+	Bookmarks   []Bookmark  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"bookmarks"`
+	Comments    []Comment   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"comments,omitempty"`
 }
 
 type UserSession struct {
-	ID           string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	UserID       string    `gorm:"type:uuid;not null;unique" json:"user_id"`
-	RefreshToken *string   `gorm:"type:text;unique" json:"refresh_token"`
-	UpdatedAt    time.Time `gorm:"type:timestamp;default:current_timestamp;autoUpdateTime" json:"updated_at"`
+	ID           string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID       string    `gorm:"type:uuid;not null;unique" json:"userID"`
+	RefreshToken *string   `gorm:"type:text;unique" json:"refreshToken"`
+	UpdatedAt    time.Time `gorm:"type:timestamp;default:current_timestamp;autoUpdateTime" json:"updatedAt"`
 }
 
 type UserRepository interface {

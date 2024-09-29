@@ -128,7 +128,7 @@ func (r *UserRepositoryDB) CreateUserAndSession(user *domain.User, refreshToken 
 
 func (r *UserRepositoryDB) FindUserWithRelation(ID uuid.UUID) (*domain.User, error) {
 	var user domain.User
-	if err := r.db.Preload("UserSession").Preload("Posts").Preload("Follower").Preload("Followed").Where("id = ?", ID).First(&user).Error; err != nil {
+	if err := r.db.Preload(clause.Associations).Where("id = ?", ID).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

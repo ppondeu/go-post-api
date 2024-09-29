@@ -308,3 +308,116 @@ func (h *PostHandler) UnlikePost(c *gin.Context) {
 
 	response.NewSuccessResponse(c, nil)
 }
+
+func (h *PostHandler) AddComment(c *gin.Context) {
+	var createCommentDto dto.CreateCommentDto
+	if err := c.ShouldBindJSON(&createCommentDto); err != nil {
+		logger.Error(err)
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	if err := h.validator.Struct(createCommentDto); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, errors.NewBadRequestError("Invalid request"))
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	comment, err := h.postService.AddComment(createCommentDto)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, comment)
+}
+
+func (h *PostHandler) UpdateComment(c *gin.Context) {
+	ID := c.Param("id")
+	commentID, err := uuid.Parse(ID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	var updateCommentDto dto.UpdateCommentDto
+	if err := c.ShouldBindJSON(&updateCommentDto); err != nil {
+		logger.Error(err)
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	if err := h.validator.Struct(updateCommentDto); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, err)
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	comment, err := h.postService.UpdateComment(commentID, updateCommentDto.Content)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, comment)
+}
+
+func (h *PostHandler) DeleteComment(c *gin.Context) {
+	ID := c.Param("id")
+	commentID, err := uuid.Parse(ID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	err = h.postService.DeleteComment(commentID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+	response.NewSuccessResponse(c, nil)
+}
+
+func (h *PostHandler) GetCommentsByPostID(c *gin.Context) {
+	ID := c.Param("id")
+	postID, err := uuid.Parse(ID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	comments, err := h.postService.GetCommentsByPost(postID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, comments)
+}
+
+func (h *PostHandler) GetCommentByID(c *gin.Context) {
+	ID := c.Param("id")
+	commentID, err := uuid.Parse(ID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	comment, err := h.postService.GetCommentByID(commentID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, comment)
+}
