@@ -9,6 +9,7 @@ import (
 	"github.com/ppondeu/go-post-api/internal/errors"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserService interface {
@@ -38,8 +39,12 @@ func (s *UserServiceImpl) GetUserByID(ID uuid.UUID) (*domain.User, error) {
 	user, err := s.userRepo.FindByID(ID)
 	if err != nil {
 		logger.Error(err)
-		return nil, err
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.NewNotFoundError("User not found")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
 	}
+
 	return user, nil
 }
 
@@ -58,7 +63,10 @@ func (s *UserServiceImpl) CreateUser(createUserDto *dto.CreateUserDto) (*domain.
 	result, err := s.userRepo.Create(user)
 	if err != nil {
 		logger.Error(err)
-		return nil, errors.NewBadRequestError("Duplicate username or email")
+		if err == gorm.ErrDuplicatedKey {
+			return nil, errors.NewBadRequestError("Duplicate username or email")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
 	}
 	return result, nil
 }
@@ -76,7 +84,10 @@ func (s *UserServiceImpl) GetUserByUsername(username string) (*domain.User, erro
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
 		logger.Error(err)
-		return nil, errors.NewBadRequestError("User with username not found")
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.NewNotFoundError("User with username not found")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
 	}
 	return user, nil
 }
@@ -85,7 +96,10 @@ func (s *UserServiceImpl) GetUserByEmail(email string) (*domain.User, error) {
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil {
 		logger.Error(err)
-		return nil, errors.NewBadRequestError("User with email not found")
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.NewNotFoundError("User with email not found")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
 	}
 	return user, nil
 }
@@ -100,7 +114,7 @@ func (s *UserServiceImpl) UpdateUser(ID uuid.UUID, updateUserDto *dto.UpdateUser
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateUserDto.Password), bcrypt.DefaultCost)
 		if err != nil {
 			logger.Error(err)
-			return nil, errors.NewInternalServerError()
+			return nil, errors.NewBadRequestError("Failed to hash password")
 		}
 		user.Password = string(hashedPassword)
 	}
@@ -117,7 +131,7 @@ func (s *UserServiceImpl) DeleteUser(ID uuid.UUID) error {
 	err := s.userRepo.Delete(ID)
 	if err != nil {
 		logger.Error(err)
-		return errors.NewNotFoundError("User not found")
+		return errors.NewBadRequestError(err.Error())
 	}
 	return nil
 }
@@ -137,7 +151,10 @@ func (s *UserServiceImpl) CreateUserAndSession(createUserDto *dto.CreateUserDto,
 	result, err := s.userRepo.CreateUserAndSession(user, refreshToken)
 	if err != nil {
 		logger.Error(err)
-		return nil, errors.NewBadRequestError("Duplicate username or email")
+		if err == gorm.ErrDuplicatedKey {
+			return nil, errors.NewBadRequestError("Duplicate username or email")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
 	}
 	return result, nil
 }
@@ -155,7 +172,10 @@ func (s *UserServiceImpl) GetUserSession(userID uuid.UUID) (*domain.UserSession,
 	session, err := s.userRepo.FindSession(userID)
 	if err != nil {
 		logger.Error(err)
-		return nil, err
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.NewNotFoundError("User session not found")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
 	}
 	return session, nil
 }
@@ -164,6 +184,9 @@ func (s *UserServiceImpl) GetUserWithRelation(ID uuid.UUID) (*domain.User, error
 	user, err := s.userRepo.FindUserWithRelation(ID)
 	if err != nil {
 		logger.Error(err)
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.NewNotFoundError("User not found")
+		}
 		return nil, err
 	}
 	return user, nil
