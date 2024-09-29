@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/domain"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PostRepositoryDB struct {
@@ -16,9 +17,9 @@ func NewPostRepositoryDB(db *gorm.DB) domain.PostRepository {
 
 func (r *PostRepositoryDB) FindAll() ([]domain.Post, error) {
 	var posts []domain.Post
-	result := r.db.Preload("User").Preload("Likes").Preload("Comments").Find(&posts)
-	if result.Error != nil {
-		return nil, result.Error
+	err := r.db.Preload(clause.Associations).Find(&posts).Error
+	if err != nil {
+		return nil, err
 	}
 	return posts, nil
 }
@@ -48,7 +49,9 @@ func (r *PostRepositoryDB) Save(post domain.Post) (*domain.Post, error) {
 	}
 	var savedPost domain.Post
 	ID, _ := uuid.Parse(post.ID)
-	err = r.db.Preload("User").Preload("Likes").Preload("Comments").First(&savedPost, ID).Error
+	err = r.db.Preload("User", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id, username")
+	}).Preload("Likes").Preload("Comments").First(&savedPost, ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +65,13 @@ func (r *PostRepositoryDB) Update(ID uuid.UUID, post domain.Post) (*domain.Post,
 	}
 
 	var updatedPost domain.Post
-	result := r.db.Preload("User").Preload("Likes").Preload("Comments").First(&updatedPost, ID)
-	if result.Error != nil {
-		return nil, result.Error
+	// result := r.db.Preload("User").Preload("Likes").Preload("Comments").First(&updatedPost, ID)
+	err = r.db.Preload("User", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id, username")
+	}).Preload("Likes").Preload("Comments").First(&updatedPost, ID).Error
+
+	if err != nil {
+		return nil, err
 	}
 	return &updatedPost, nil
 }

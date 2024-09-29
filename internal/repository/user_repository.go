@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/domain"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepositoryDB struct {
@@ -135,7 +136,7 @@ func (r *UserRepositoryDB) FindUserWithRelation(ID uuid.UUID) (*domain.User, err
 
 func (r *UserRepositoryDB) FindAllUsersWithRelation() ([]domain.User, error) {
 	var users []domain.User
-	if err := r.db.Preload("UserSession").Preload("Posts").Preload("Follower").Preload("Followed").Find(&users).Error; err != nil {
+	if err := r.db.Preload(clause.Associations).Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil
