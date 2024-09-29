@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/domain"
 	"github.com/ppondeu/go-post-api/internal/dto"
-	errs "github.com/ppondeu/go-post-api/internal/errors"
+	"github.com/ppondeu/go-post-api/internal/errors"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -47,7 +47,7 @@ func (s *UserServiceImpl) CreateUser(createUserDto *dto.CreateUserDto) (*domain.
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(createUserDto.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err)
-		return nil, errs.NewInternalServerError()
+		return nil, errors.NewInternalServerError()
 	}
 	user := &domain.User{
 		Username: createUserDto.Username,
@@ -58,7 +58,7 @@ func (s *UserServiceImpl) CreateUser(createUserDto *dto.CreateUserDto) (*domain.
 	result, err := s.userRepo.Create(user)
 	if err != nil {
 		logger.Error(err)
-		return nil, errs.NewBadRequestError("Duplicate username or email")
+		return nil, errors.NewBadRequestError("Duplicate username or email")
 	}
 	return result, nil
 }
@@ -76,7 +76,7 @@ func (s *UserServiceImpl) GetUserByUsername(username string) (*domain.User, erro
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
 		logger.Error(err)
-		return nil, errs.NewBadRequestError("User with username not found")
+		return nil, errors.NewBadRequestError("User with username not found")
 	}
 	return user, nil
 }
@@ -85,7 +85,7 @@ func (s *UserServiceImpl) GetUserByEmail(email string) (*domain.User, error) {
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil {
 		logger.Error(err)
-		return nil, errs.NewBadRequestError("User with email not found")
+		return nil, errors.NewBadRequestError("User with email not found")
 	}
 	return user, nil
 }
@@ -100,7 +100,7 @@ func (s *UserServiceImpl) UpdateUser(ID uuid.UUID, updateUserDto *dto.UpdateUser
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updateUserDto.Password), bcrypt.DefaultCost)
 		if err != nil {
 			logger.Error(err)
-			return nil, errs.NewInternalServerError()
+			return nil, errors.NewInternalServerError()
 		}
 		user.Password = string(hashedPassword)
 	}
@@ -117,7 +117,7 @@ func (s *UserServiceImpl) DeleteUser(ID uuid.UUID) error {
 	err := s.userRepo.Delete(ID)
 	if err != nil {
 		logger.Error(err)
-		return errs.NewNotFoundError("User not found")
+		return errors.NewNotFoundError("User not found")
 	}
 	return nil
 }
@@ -126,7 +126,7 @@ func (s *UserServiceImpl) CreateUserAndSession(createUserDto *dto.CreateUserDto,
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(createUserDto.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err)
-		return nil, errs.NewInternalServerError()
+		return nil, errors.NewInternalServerError()
 	}
 	user := &domain.User{
 		Username: createUserDto.Username,
@@ -137,7 +137,7 @@ func (s *UserServiceImpl) CreateUserAndSession(createUserDto *dto.CreateUserDto,
 	result, err := s.userRepo.CreateUserAndSession(user, refreshToken)
 	if err != nil {
 		logger.Error(err)
-		return nil, errs.NewBadRequestError("Duplicate username or email")
+		return nil, errors.NewBadRequestError("Duplicate username or email")
 	}
 	return result, nil
 }

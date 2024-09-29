@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/dto"
-	errs "github.com/ppondeu/go-post-api/internal/errors"
+	"github.com/ppondeu/go-post-api/internal/errors"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"github.com/ppondeu/go-post-api/internal/response"
 	"github.com/ppondeu/go-post-api/internal/usecase"
@@ -48,7 +48,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
 		return
 	}
 
@@ -71,7 +71,7 @@ func (h *UserHandler) GetUserSession(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
 		return
 	}
 
@@ -118,25 +118,25 @@ func (h *UserHandler) GetUserByEmail(c *gin.Context) {
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var craeteUserDto dto.CreateUserDto
-	if err := c.ShouldBindJSON(&craeteUserDto); err != nil {
+	var createUserDto dto.CreateUserDto
+	if err := c.ShouldBindJSON(&createUserDto); err != nil {
 		logger.Error(err)
 		response.NewErrorResponse(c, err)
 		return
 	}
 
-	if err := h.validator.Struct(craeteUserDto); err != nil {
+	if err := h.validator.Struct(createUserDto); err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
 			logger.Error(err)
 			response.NewErrorResponse(c, err)
 			return
 		}
 		logger.Error(err)
-		response.NewErrorResponse(c, errs.NewBadRequestError(err.Error()))
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
 		return
 	}
 
-	user, err := h.userService.CreateUserAndSession(&craeteUserDto, nil)
+	user, err := h.userService.CreateUserAndSession(&createUserDto, nil)
 	if err != nil {
 		logger.Error(err)
 		response.NewErrorResponse(c, err)
@@ -157,7 +157,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	logger.Info(fmt.Sprintf("idParam: %v", idParam))
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
 		return
 	}
 
@@ -175,7 +175,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 			return
 		}
 		logger.Error(err)
-		response.NewErrorResponse(c, errs.NewBadRequestError(err.Error()))
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
 		return
 	}
 
@@ -199,7 +199,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
 		return
 	}
 
@@ -215,7 +215,7 @@ func (h *UserHandler) UpdateUserSession(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
 		return
 	}
 	type RefreshToken struct {
@@ -235,7 +235,7 @@ func (h *UserHandler) UpdateUserSession(c *gin.Context) {
 			return
 		}
 		logger.Error(err)
-		response.NewErrorResponse(c, errs.NewBadRequestError(err.Error()))
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
 		return
 	}
 
@@ -261,7 +261,7 @@ func (h *UserHandler) GetUserWithRelation(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		response.NewErrorResponse(c, errs.NewBadRequestError("id is invalid"))
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
 		return
 	}
 

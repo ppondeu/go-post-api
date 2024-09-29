@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/ppondeu/go-post-api/internal/dto"
-	errs "github.com/ppondeu/go-post-api/internal/errors"
+	"github.com/ppondeu/go-post-api/internal/errors"
 	"github.com/ppondeu/go-post-api/internal/logger"
 	"github.com/ppondeu/go-post-api/internal/utils"
 )
@@ -100,7 +100,7 @@ func (s *authServiceImpl) RefreshToken(refreshToken string, ID uuid.UUID) (*dto.
 	}
 
 	if claims.TokenType != "refresh" {
-		return nil, errs.NewForbiddenError("invalid token type")
+		return nil, errors.NewForbiddenError("invalid token type")
 	}
 
 	userID, err := uuid.Parse(claims.Sub)
@@ -117,12 +117,12 @@ func (s *authServiceImpl) RefreshToken(refreshToken string, ID uuid.UUID) (*dto.
 
 	if user.UserSession.RefreshToken == nil || claims.Username != user.Username {
 		logger.Error(err)
-		return nil, errs.NewForbiddenError("invalid refresh token")
+		return nil, errors.NewForbiddenError("invalid refresh token")
 	}
 
 	if *user.UserSession.RefreshToken != refreshToken {
 		logger.Error(err)
-		return nil, errs.NewForbiddenError("invalid refresh token")
+		return nil, errors.NewForbiddenError("invalid refresh token")
 	}
 
 	userClaims := UserClaims{
@@ -172,12 +172,12 @@ func (s *authServiceImpl) Logout(refreshToken string, ID uuid.UUID) error {
 
 	if user.RefreshToken == nil {
 		logger.Error(err)
-		return errs.NewForbiddenError("invalid refresh token")
+		return errors.NewForbiddenError("invalid refresh token")
 	}
 
 	if *user.RefreshToken != refreshToken {
 		logger.Error(err)
-		return errs.NewForbiddenError("invalid refresh token")
+		return errors.NewForbiddenError("invalid refresh token")
 	}
 
 	err = s.userService.UpdateUserSession(ID, nil)
