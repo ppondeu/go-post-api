@@ -31,6 +31,10 @@ func main() {
 	authService := usecase.NewAuthService(userService, jwtService)
 	authHandler := handler.NewAuthHandler(authService, validate)
 
+	postRepo := repository.NewPostRepositoryDB(db)
+	postService := usecase.NewPostService(postRepo)
+	postHandler := handler.NewPostHandler(postService, validate)
+
 	router := gin.Default()
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -41,6 +45,7 @@ func main() {
 	routes.SetupUserRouter(router, userHandler)
 	routes.SetupAuthRouter(router, authHandler, &jwtService)
 	routes.SetupFollowRouter(router, followHandler)
+	routes.SetupPostRouter(router, postHandler)
 	fmt.Printf("Server running on port %v", cfg.SERVER_PORT)
 	router.Run(":" + cfg.SERVER_PORT)
 }

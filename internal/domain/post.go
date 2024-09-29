@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -46,4 +47,13 @@ type Post struct {
 	User     User           `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Likes    []Like         `gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Comments []Comment      `gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type PostRepository interface {
+	FindAll() ([]Post, error)
+	FindByID(ID uuid.UUID) (*Post, error)
+	FindByUserID(userID uuid.UUID) ([]Post, error)
+	Save(post Post) (*Post, error)
+	Update(ID uuid.UUID, post Post) (*Post, error)
+	Delete(ID uuid.UUID) error
 }
