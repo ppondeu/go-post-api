@@ -140,3 +140,18 @@ func (r *UserRepositoryDB) FindAllUsersWithRelation() ([]domain.User, error) {
 	}
 	return users, nil
 }
+
+func (r *UserRepositoryDB) FindUserBookmarks(userID uuid.UUID) ([]domain.Bookmark, error) {
+	var bookmarks []domain.Bookmark
+	if err := r.db.Preload("Post").Where("user_id = ?", userID).Find(&bookmarks).Error; err != nil {
+		return nil, err
+	}
+	return bookmarks, nil
+}
+
+func (r *UserRepositoryDB) AddBookmark(bookmark domain.Bookmark) error {
+	if err := r.db.Create(&bookmark).Error; err != nil {
+		return err
+	}
+	return nil
+}

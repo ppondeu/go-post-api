@@ -272,3 +272,19 @@ func (h *UserHandler) GetUserWithRelation(c *gin.Context) {
 	}
 	response.NewSuccessResponse(c, user)
 }
+
+func (h *UserHandler) GetUserBookmarks(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		response.NewErrorResponse(c, errors.NewBadRequestError("id is invalid"))
+		return
+	}
+
+	bookmarks, err := h.userService.GetUserBookmarks(id)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+	response.NewSuccessResponse(c, bookmarks)
+}

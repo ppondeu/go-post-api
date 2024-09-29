@@ -25,6 +25,8 @@ type UserService interface {
 	CreateUserAndSession(createUserDto *dto.CreateUserDto, refreshToken *string) (*domain.User, error)
 	GetUserSession(userID uuid.UUID) (*domain.UserSession, error)
 	DeleteUser(ID uuid.UUID) error
+
+	GetUserBookmarks(userID uuid.UUID) ([]domain.Bookmark, error)
 }
 
 type UserServiceImpl struct {
@@ -199,4 +201,16 @@ func (s *UserServiceImpl) GetUsersWithRelation() ([]domain.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (s *UserServiceImpl) GetUserBookmarks(userID uuid.UUID) ([]domain.Bookmark, error) {
+	bookmarks, err := s.userRepo.FindUserBookmarks(userID)
+	if err != nil {
+		logger.Error(err)
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.NewNotFoundError("Bookmarks not found")
+		}
+		return nil, errors.NewBadRequestError(err.Error())
+	}
+	return bookmarks, nil
 }

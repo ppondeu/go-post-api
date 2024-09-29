@@ -85,3 +85,27 @@ func (r *PostRepositoryDB) FindAllTags() ([]domain.Tag, error) {
 	}
 	return tags, nil
 }
+
+func (r *PostRepositoryDB) AddBookmark(bookmark domain.Bookmark) error {
+	result := r.db.Create(&bookmark)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *PostRepositoryDB) RemoveBookmark(userID, postID uuid.UUID) error {
+	result := r.db.Delete(&domain.Bookmark{}, "user_id = ? AND post_id = ?", userID, postID)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *PostRepositoryDB) CreateTag(tag domain.Tag) (*domain.Tag, error) {
+	err := r.db.Create(&tag).Error
+	if err != nil {
+		return nil, err
+	}
+	return &tag, nil
+}

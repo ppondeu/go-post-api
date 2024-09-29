@@ -21,5 +21,7 @@ func SetupUserRouter(router *gin.Engine, userHandler *handler.UserHandler) {
 
 		user.GET("/test", userHandler.GetUsersWithRelation)
 		user.GET("/test/id", userHandler.GetUserWithRelation)
+
+		user.GET("/bookmarks/:id", userHandler.GetUserBookmarks)
 	}
 }

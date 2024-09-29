@@ -152,3 +152,81 @@ func (h *PostHandler) GetTags(c *gin.Context) {
 	}
 	response.NewSuccessResponse(c, tags)
 }
+
+func (h *PostHandler) AddBookmark(c *gin.Context) {
+	var createBookmarkDto dto.BookmarkDto
+	if err := c.ShouldBindJSON(&createBookmarkDto); err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	if err := h.validator.Struct(createBookmarkDto); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, errors.NewBadRequestError("Invalid request"))
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	userId, err := uuid.Parse(createBookmarkDto.UserID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	postId, err := uuid.Parse(createBookmarkDto.PostID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	err = h.postService.AddBookmark(userId, postId)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, nil)
+}
+
+func (h *PostHandler) RemoveBookmark(c *gin.Context) {
+	var removeBookmarkDto dto.BookmarkDto
+	if err := c.ShouldBindJSON(&removeBookmarkDto); err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	if err := h.validator.Struct(removeBookmarkDto); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Error(err)
+			response.NewErrorResponse(c, errors.NewBadRequestError("Invalid request"))
+			return
+		}
+		logger.Error(err)
+		response.NewErrorResponse(c, errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	userId, err := uuid.Parse(removeBookmarkDto.UserID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	postId, err := uuid.Parse(removeBookmarkDto.PostID)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	err = h.postService.RemoveBookmark(userId, postId)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewSuccessResponse(c, nil)
+}

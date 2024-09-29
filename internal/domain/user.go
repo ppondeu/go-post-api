@@ -38,4 +38,6 @@ type UserRepository interface {
 	CreateUserAndSession(user *User, refreshToken *string) (*User, error)
 	UpdateSession(userID uuid.UUID, refreshToken *string) error
 	FindSession(userID uuid.UUID) (*UserSession, error)
+
+	FindUserBookmarks(userID uuid.UUID) ([]Bookmark, error)
 }

@@ -18,15 +18,19 @@ type PostService interface {
 	DeletePost(ID uuid.UUID) error
 
 	GetAllTags() ([]domain.Tag, error)
+	AddBookmark(userId, postId uuid.UUID) error
+	RemoveBookmark(userId, postId uuid.UUID) error
 }
 
 type postServiceImpl struct {
-	postRepo domain.PostRepository
+	postRepo    domain.PostRepository
+	userService UserService
 }
 
-func NewPostService(postRepo domain.PostRepository) PostService {
+func NewPostService(postRepo domain.PostRepository, userService UserService) PostService {
 	return &postServiceImpl{
-		postRepo: postRepo,
+		postRepo:    postRepo,
+		userService: userService,
 	}
 }
 
@@ -113,9 +117,60 @@ func (p *postServiceImpl) DeletePost(ID uuid.UUID) error {
 func (p *postServiceImpl) GetAllTags() ([]domain.Tag, error) {
 	tags, err := p.postRepo.FindAllTags()
 	if err != nil {
-		logger.Error(err)
 		return nil, err
 	}
 
 	return tags, nil
+}
+
+func (p *postServiceImpl) AddBookmark(userId, postId uuid.UUID) error {
+	_, err := p.userService.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+	post, err := p.GetPostByID(postId)
+	if err != nil {
+		return err
+	}
+
+	if post.UserID == userId.String() {
+		logger.Error("You can't bookmark your own post")
+		return errors.NewBadRequestError("You can't bookmark your own post")
+	}
+
+	bookmark := domain.Bookmark{
+		UserID: userId.String(),
+		PostID: postId.String(),
+	}
+
+	err = p.postRepo.AddBookmark(bookmark)
+	if err != nil {
+		return errors.NewBadRequestError("Bookmark already exists")
+	}
+
+	return nil
+}
+
+func (p *postServiceImpl) RemoveBookmark(userId, postId uuid.UUID) error {
+	_, err := p.userService.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+	post, err := p.GetPostByID(postId)
+	if err != nil {
+		return err
+	}
+
+	if post.UserID == userId.String() {
+		logger.Error("You can't remove bookmark from your own post")
+		return errors.NewBadRequestError("You can't remove bookmark from your own post")
+	}
+
+	err = p.postRepo.RemoveBookmark(userId, postId)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
 }

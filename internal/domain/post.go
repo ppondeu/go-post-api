@@ -59,4 +59,8 @@ type PostRepository interface {
 	Delete(ID uuid.UUID) error
 
 	FindAllTags() ([]Tag, error)
+	AddBookmark(bookmark Bookmark) error
+	RemoveBookmark(userID, postID uuid.UUID) error
+
+	CreateTag(tag Tag) (*Tag, error)
 }

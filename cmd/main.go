@@ -32,7 +32,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService, validate)
 
 	postRepo := repository.NewPostRepositoryDB(db)
-	postService := usecase.NewPostService(postRepo)
+	postService := usecase.NewPostService(postRepo, userService)
 	postHandler := handler.NewPostHandler(postService, validate)
 
 	router := gin.Default()
